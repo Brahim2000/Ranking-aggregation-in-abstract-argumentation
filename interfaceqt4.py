@@ -22,6 +22,7 @@ class Ui_Form(object):
             "tuple": lambda: tuple_based(self.G),
             "Matt & Toni": lambda: mt_ranking(self.G),
         }
+        self.alpha_widgets_values = {}
 
     def handle_alpha_burden(self, alpha_value):
         if alpha_value == 0:
@@ -170,12 +171,15 @@ class Ui_Form(object):
         widget_height = 45
         total_height = count * widget_height
 
+        # Store current values
+        self.store_alpha_widgets_values()
+
         for i in reversed(range(self.alphaScrollAreaLayout.count())):
             widget = self.alphaScrollAreaLayout.itemAt(i).widget()
             if widget is not None:
                 widget.deleteLater()
 
-        for _ in range(count):
+        for index in range(count):
             alphaWidget = QtWidgets.QWidget(self.alphaScrollAreaWidgetContents)
             alphaWidget.setFixedSize(520, widget_height)
             alphaWidgetLayout = QtWidgets.QHBoxLayout(alphaWidget)
@@ -210,6 +214,11 @@ class Ui_Form(object):
 
             self.alphaScrollAreaLayout.addWidget(alphaWidget)
 
+            # Restore previous values if they exist
+            if index in self.alpha_widgets_values:
+                doubleSpinBox.setValue(self.alpha_widgets_values[index][0])
+                lineEdit.setText(self.alpha_widgets_values[index][1])
+
         if count > 0:
             self.alphaContainer.setVisible(True)
             self.alphaScrollArea.setVisible(True)
@@ -222,6 +231,16 @@ class Ui_Form(object):
             self.alphaContainer.setVisible(False)
             self.alphaScrollArea.setVisible(False)
             self.widget_5.setFixedHeight(101)
+
+    def store_alpha_widgets_values(self):
+        self.alpha_widgets_values.clear()
+        for index in range(self.alphaScrollAreaLayout.count()):
+            widget = self.alphaScrollAreaLayout.itemAt(index).widget()
+            if widget is not None:
+                doubleSpinBox = widget.findChild(QtWidgets.QDoubleSpinBox)
+                lineEdit = widget.findChild(QtWidgets.QLineEdit)
+                if doubleSpinBox is not None and lineEdit is not None:
+                    self.alpha_widgets_values[index] = (doubleSpinBox.value(), lineEdit.text())
 
     def update_line_edit(self, line_edit, result, spinbox_value):
         if spinbox_value == 0:
