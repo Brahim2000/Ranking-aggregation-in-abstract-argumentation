@@ -260,21 +260,46 @@ class Ui_Form(object):
         QtWidgets.QWidget.resizeEvent(self.alphaContainer, event)
 
     def on_aggregate_button_clicked(self):
+        # Add top spacer
+        top_spacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayoutInsideScrollArea.addItem(top_spacer)
+
         separator_label = QtWidgets.QLabel("Aggregation")
         separator_label.setFixedHeight(60)
         separator_label.setAlignment(QtCore.Qt.AlignCenter)
         separator_label.setStyleSheet("background-color: green; color: white; font-size: 24px; font-weight: bold;border-radius: 15px;")
         self.verticalLayoutInsideScrollArea.addWidget(separator_label)
 
+        # Add bottom spacer
+        bottom_spacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayoutInsideScrollArea.addItem(bottom_spacer)
+
         aggregate_widget = QtWidgets.QWidget(self.scrollAreaWidgetContents)
         aggregate_layout = QtWidgets.QVBoxLayout(aggregate_widget)
 
-        # Add content to aggregate_widget as per your requirements
-        label = QtWidgets.QLabel("This is the aggregate content")
-        aggregate_layout.addWidget(label)
+        # Create 4 main widgets, each with a label, combo box, and line edit
+        for i in range(1, 5):
+            method_widget = QtWidgets.QWidget(aggregate_widget)
+            method_layout = QtWidgets.QHBoxLayout(method_widget)
+
+            label = QtWidgets.QLabel(f"Method {i}", method_widget)
+            label.setFixedWidth(100)
+            method_layout.addWidget(label)
+
+            combo_box = QtWidgets.QComboBox(method_widget)
+            combo_box.addItems(["Option 1", "Option 2", "Option 3"])
+            combo_box.setFixedWidth(150)
+            method_layout.addWidget(combo_box)
+
+            line_edit = QtWidgets.QLineEdit(method_widget)
+            line_edit.setFixedWidth(300)
+            method_layout.addWidget(line_edit)
+
+            aggregate_layout.addWidget(method_widget)
 
         self.verticalLayoutInsideScrollArea.addWidget(aggregate_widget)
         self.scrollAreaWidgetContents.adjustSize()
+
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
