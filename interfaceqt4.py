@@ -31,7 +31,7 @@ class Ui_Form(object):
 
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(968, 593)
+        Form.resize(968, 780)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")
         self.scrollArea = QtWidgets.QScrollArea(Form)
@@ -63,6 +63,7 @@ class Ui_Form(object):
         self.aggregateButton.setObjectName("aggregateButton")
         self.aggregateButton.setFixedSize(130, 50)
         self.aggregateButton.setStyleSheet("background-color: green; color: white; font-size: 16px; font-weight: bold;border-radius: 15px;")
+        self.aggregateButton.clicked.connect(self.on_aggregate_button_clicked)  # Connect the button click event
 
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.addStretch()
@@ -257,6 +258,23 @@ class Ui_Form(object):
         self.widget_5.setFixedHeight(new_height + 10)
         print(f"widget_5 resized: {self.widget_5.size()}")
         QtWidgets.QWidget.resizeEvent(self.alphaContainer, event)
+
+    def on_aggregate_button_clicked(self):
+        separator_label = QtWidgets.QLabel("Aggregation")
+        separator_label.setFixedHeight(60)
+        separator_label.setAlignment(QtCore.Qt.AlignCenter)
+        separator_label.setStyleSheet("background-color: green; color: white; font-size: 24px; font-weight: bold;border-radius: 15px;")
+        self.verticalLayoutInsideScrollArea.addWidget(separator_label)
+
+        aggregate_widget = QtWidgets.QWidget(self.scrollAreaWidgetContents)
+        aggregate_layout = QtWidgets.QVBoxLayout(aggregate_widget)
+
+        # Add content to aggregate_widget as per your requirements
+        label = QtWidgets.QLabel("This is the aggregate content")
+        aggregate_layout.addWidget(label)
+
+        self.verticalLayoutInsideScrollArea.addWidget(aggregate_widget)
+        self.scrollAreaWidgetContents.adjustSize()
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
