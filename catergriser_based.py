@@ -28,17 +28,17 @@ def categoriser_based_ranking(G) :
     for i, node in enumerate(sorted_nodes):
         current_value = categoriser_values[node]
         if previous_value is None:
-            equal_group.append(f'"{node}"')
+            equal_group.append(node)
         elif current_value == previous_value:
-            equal_group.append(f'"{node}"')
+            equal_group.append(node)
         else:
             if equal_group:
-                rank_string += " ≃ ".join(equal_group) + " ≻ "
-            equal_group = [f'"{node}"']
+                rank_string += " , ".join(equal_group) + " > "
+            equal_group = [node]
         previous_value = current_value
 
     if equal_group:
-        rank_string += " ≃ ".join(equal_group)
+        rank_string += " , ".join(equal_group)
 
     #affichage console
     print("categoriser values", categoriser_values)

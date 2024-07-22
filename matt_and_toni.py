@@ -37,11 +37,11 @@ def mt_ranking(G):
     # Create a reverse dictionary with ranks as keys and list of nodes with that rank as values
     reverse_rank_dict = {}
     for node, rank in rank_dict.items():
-        reverse_rank_dict.setdefault(rank, []).append(f'"{node}"')
+        reverse_rank_dict.setdefault(rank, []).append(node)
     
     # Convert the reverse dictionary to the desired string format
     rank_str = " > ".join(
-        [" = ".join(map(str, sorted(nodes))) for rank, nodes in sorted(reverse_rank_dict.items())]
+        [" , ".join(map(str, sorted(nodes))) for rank, nodes in sorted(reverse_rank_dict.items())]
     )
     
     return rank_str

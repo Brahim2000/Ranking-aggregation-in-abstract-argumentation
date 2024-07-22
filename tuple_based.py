@@ -122,13 +122,13 @@ def format_ranking(ranking, nodes_scores):
 
     scores_dict = {node: score for node, score in nodes_scores}
     
-    result = f'"{ranking[0]}"'
+    result = ranking[0]
     i = 1
     while i < len(ranking):
         if i > 0 and scores_dict[ranking[i]] == scores_dict[ranking[i - 1]]:
-            result += f' = "{ranking[i]}" '
+            result += f' , {ranking[i]} '
         else:
-            result += f' > "{ranking[i]}" '
+            result += f' > {ranking[i]} '
         i += 1
 
     return result

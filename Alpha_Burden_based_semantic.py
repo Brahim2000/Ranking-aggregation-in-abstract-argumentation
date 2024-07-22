@@ -51,11 +51,11 @@ def alpha_burden_based(G, alpha) :
     ranking_str = ""
     for i, (node, value) in enumerate(sorted_nodes):
         if i == 0:
-            ranking_str += f'"{node}"'
+            ranking_str += node
         else:
             if value == sorted_nodes[i-1][1]:
-                ranking_str += f' = "{node}"'
+                ranking_str += f' , {node}'
             else:
-                ranking_str += f' > "{node}"'
+                ranking_str += f' > {node}'
     
     return ranking_str

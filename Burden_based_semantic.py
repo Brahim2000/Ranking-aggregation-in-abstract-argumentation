@@ -38,16 +38,16 @@ def burden_based(G, threshold) :
     current_group = []
 
     for node, burden_vector in sorted_nodes:
-        node_str = f'"{node}"'  # Add quotes around the node
+        node_str = node  # Add quotes around the node
         if burden_vector == prev_burden_vector:
             current_group.append(node_str)
         else:
             if current_group:
-                ranking.append(" = ".join(current_group))
+                ranking.append(" , ".join(current_group))
             current_group = [node_str]
             prev_burden_vector = burden_vector
 
     if current_group:
-        ranking.append(" = ".join(current_group))
+        ranking.append(" , ".join(current_group))
 
     return " > ".join(ranking)

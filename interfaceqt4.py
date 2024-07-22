@@ -166,7 +166,7 @@ class Ui_Form(object):
                     lineEdit.clear()
                 else:
                     lineEdit.setText(str(result))
-
+#♥##############################################################################################################################################
     def create_alpha_widgets(self, count, parent_widget):
         max_height = 200
         widget_height = 45
@@ -242,7 +242,7 @@ class Ui_Form(object):
                 lineEdit = widget.findChild(QtWidgets.QLineEdit)
                 if doubleSpinBox is not None and lineEdit is not None:
                     self.alpha_widgets_values[index] = (doubleSpinBox.value(), lineEdit.text())
-
+#♥##############################################################################################################################################
     def update_line_edit(self, line_edit, result, spinbox_value):
         if spinbox_value == 0:
             line_edit.clear()
@@ -252,13 +252,14 @@ class Ui_Form(object):
     def update_line_edit_for_alpha(self, line_edit, alpha_value):
         result = self.handle_alpha_burden(alpha_value)
         line_edit.setText(str(result))
-
+#♥##############################################################################################################################################
     def on_alpha_container_resized(self, event):
         new_height = self.alphaContainer.height()
         self.widget_5.setFixedHeight(new_height + 10)
         print(f"widget_5 resized: {self.widget_5.size()}")
         QtWidgets.QWidget.resizeEvent(self.alphaContainer, event)
 
+#♥##############################################################################################################################################
     def on_aggregate_button_clicked(self):
 
         self.aggregateButton.setVisible(False)
@@ -332,7 +333,7 @@ class Ui_Form(object):
         self.verticalLayoutInsideScrollArea.addWidget(aggregate_widget)
         self.scrollAreaWidgetContents.adjustSize()
         QtCore.QTimer.singleShot(0, lambda: self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().maximum()))
-
+#♥##############################################################################################################################################
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
