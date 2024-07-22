@@ -118,23 +118,25 @@ def tuple_based(G):
 
 def format_ranking(ranking, nodes_scores):
     if not ranking:
-        return ""
+        return []
 
-    scores_dict = {node: score for node, score in nodes_scores}
+    scores_dict = {node: tuple(score) for node, score in nodes_scores}
     
-    result = ranking[0]
-    i = 1
-    while i < len(ranking):
-        if i > 0 and scores_dict[ranking[i]] == scores_dict[ranking[i - 1]]:
-            result += f' , {ranking[i]} '
+    rankings = []
+    current_group = []
+    prev_score = None
+
+    for node in ranking:
+        current_score = scores_dict[node]
+        if prev_score is None or current_score == prev_score:
+            current_group.append(node)
         else:
-            result += f' > {ranking[i]} '
-        i += 1
+            rankings.append(current_group)
+            current_group = [node]
+        prev_score = current_score
 
-    return result
+    if current_group:
+        rankings.append(current_group)
 
-# Usage
-# import networkx as nx
-# G = nx.DiGraph()
-# ... (add nodes and edges to G)
-# print(tuple_based(G))
+    return rankings
+

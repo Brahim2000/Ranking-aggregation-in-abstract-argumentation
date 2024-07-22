@@ -27,35 +27,34 @@ def burden(num_nodes, attaquants, alpha, epsilon):
   return burden_values_next
 
 
-def alpha_burden_based(G, alpha) :
-  #Initialization:
+def alpha_burden_based(G, alpha):
+    # Initialization:
     node_to_index = {node: index for index, node in enumerate(G.nodes())}
     predecessors = {node_to_index[node]: [node_to_index[pred] for pred in G.predecessors(node)] for node in G.nodes()}
     num_nodes = G.number_of_nodes()
     nodes = list(G.nodes())
-    
-    s_alpha_tab = [0] * num_nodes
 
-    #Create the steps tab
-    #for j in range(num_nodes):
-      #s_alpha_tab[j] = s_alpha(j, alpha, predecessors, s_alpha_tab)
-    
+    # Calculate burden values
     s_alpha_tab = burden(num_nodes, predecessors, alpha, epsilon=0.00001)
 
-    #print(s_alpha_tab)
-
-    #Rank
+    # Rank nodes
     nodes_sa = list(zip(nodes, s_alpha_tab))
     sorted_nodes = sorted(nodes_sa, key=lambda x: x[1])
-    
-    ranking_str = ""
-    for i, (node, value) in enumerate(sorted_nodes):
-        if i == 0:
-            ranking_str += node
+
+    # Create the rankings as lists of lists
+    rankings = []
+    prev_value = None
+    current_group = []
+
+    for node, value in sorted_nodes:
+        if prev_value is None or value == prev_value:
+            current_group.append(node)
         else:
-            if value == sorted_nodes[i-1][1]:
-                ranking_str += f' , {node}'
-            else:
-                ranking_str += f' > {node}'
-    
-    return ranking_str
+            rankings.append(current_group)
+            current_group = [node]
+        prev_value = value
+
+    if current_group:
+        rankings.append(current_group)
+
+    return rankings

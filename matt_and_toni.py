@@ -30,7 +30,8 @@ def zero_sum(G):
 def mt_ranking(G):
     values = zero_sum(G)
     ranking = sorted(G.nodes(), key=lambda x: values[x], reverse=True)
-    print("matt toni ranking is ", values)
+    print("Matt Toni ranking is ", values)
+    
     # Create a dictionary with nodes as keys and their ranks as values
     rank_dict = {node: rank for rank, node in enumerate(ranking, start=1)}
     
@@ -39,9 +40,9 @@ def mt_ranking(G):
     for node, rank in rank_dict.items():
         reverse_rank_dict.setdefault(rank, []).append(node)
     
-    # Convert the reverse dictionary to the desired string format
-    rank_str = " > ".join(
-        [" , ".join(map(str, sorted(nodes))) for rank, nodes in sorted(reverse_rank_dict.items())]
-    )
-    
-    return rank_str
+    # Convert the reverse dictionary to a list of lists format
+    rankings = []
+    for rank, nodes in sorted(reverse_rank_dict.items()):
+        rankings.append(sorted(nodes))
+
+    return rankings

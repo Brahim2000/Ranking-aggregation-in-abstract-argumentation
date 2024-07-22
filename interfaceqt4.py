@@ -12,6 +12,19 @@ def load_graph_from_file(filename="graph.gml"):
     print(f"Graph loaded from {filename}")
     return G
 
+def rankings_to_string(rankings):
+    """
+    Transforms rankings from a list of lists into a ranking string.
+    """
+    rank_string = ""
+    
+    for equal_group in rankings:
+        if rank_string:
+            rank_string += " > "
+        rank_string += " , ".join(equal_group)
+    
+    return rank_string
+
 class Ui_Form(object):
     def __init__(self):
         self.G = load_graph_from_file()
@@ -165,7 +178,7 @@ class Ui_Form(object):
                 if spinBox.value() == 0:
                     lineEdit.clear()
                 else:
-                    lineEdit.setText(str(result))
+                    lineEdit.setText(rankings_to_string(result))
 #♥##############################################################################################################################################
     def create_alpha_widgets(self, count, parent_widget):
         max_height = 200
@@ -247,11 +260,11 @@ class Ui_Form(object):
         if spinbox_value == 0:
             line_edit.clear()
         else:
-            line_edit.setText(str(result))
+            line_edit.setText(rankings_to_string(result))
 
     def update_line_edit_for_alpha(self, line_edit, alpha_value):
         result = self.handle_alpha_burden(alpha_value)
-        line_edit.setText(str(result))
+        line_edit.setText(rankings_to_string(result))
 #♥##############################################################################################################################################
     def on_alpha_container_resized(self, event):
         new_height = self.alphaContainer.height()
