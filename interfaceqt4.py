@@ -260,45 +260,76 @@ class Ui_Form(object):
         QtWidgets.QWidget.resizeEvent(self.alphaContainer, event)
 
     def on_aggregate_button_clicked(self):
-        # Add top spacer
-        top_spacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayoutInsideScrollArea.addItem(top_spacer)
+            self.aggregateButton.setVisible(False)
 
-        separator_label = QtWidgets.QLabel("Aggregation")
-        separator_label.setFixedHeight(60)
-        separator_label.setAlignment(QtCore.Qt.AlignCenter)
-        separator_label.setStyleSheet("background-color: green; color: white; font-size: 24px; font-weight: bold;border-radius: 15px;")
-        self.verticalLayoutInsideScrollArea.addWidget(separator_label)
+            separator_label = QtWidgets.QLabel("Aggregation Results")
+            separator_label.setFixedHeight(60)
+            separator_label.setAlignment(QtCore.Qt.AlignCenter)
+            separator_label.setStyleSheet("background-color: green; color: white; font-size: 24px; font-weight: bold;border-radius: 15px;")
+            self.verticalLayoutInsideScrollArea.addWidget(separator_label)
 
-        # Add bottom spacer
-        bottom_spacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayoutInsideScrollArea.addItem(bottom_spacer)
+            aggregate_widget = QtWidgets.QWidget(self.scrollAreaWidgetContents)
+            aggregate_widget.setObjectName("aggregate_widget")
 
-        aggregate_widget = QtWidgets.QWidget(self.scrollAreaWidgetContents)
-        aggregate_layout = QtWidgets.QVBoxLayout(aggregate_widget)
+            backgroundLabel = RoundedLabel(aggregate_widget)
+            backgroundLabel.setGeometry(0, 0, 891, 420)
+            backgroundLabel.setObjectName("backgroundLabel_aggregate")
+            backgroundLabel.setPixmap(QtGui.QPixmap('img2.jpg'))
 
-        # Create 4 main widgets, each with a label, combo box, and line edit
-        for i in range(1, 5):
-            method_widget = QtWidgets.QWidget(aggregate_widget)
-            method_layout = QtWidgets.QHBoxLayout(method_widget)
+            aggregate_layout = QtWidgets.QVBoxLayout(aggregate_widget)
+            aggregate_layout.setContentsMargins(0, 0, 0, 0)
+            Method = ["Score" , "Sequential Winner" , "Sequential Loser" , "Kemeny"]
+            for i in range(1, 5):
+                method_widget = QtWidgets.QWidget(aggregate_widget)
+                method_widget.setMinimumSize(QtCore.QSize(891, 80))
+                method_widget.setObjectName(f"method_widget_{i}")
+                method_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
 
-            label = QtWidgets.QLabel(f"Method {i}", method_widget)
-            label.setFixedWidth(100)
-            method_layout.addWidget(label)
+                method_label = QtWidgets.QLabel(method_widget)
+                method_label.setGeometry(QtCore.QRect(10, 30, 160, 31))
+                font = QtGui.QFont()
+                font.setPointSize(10)
+                method_label.setFont(font)
+                method_label.setAutoFillBackground(False)
+                method_label.setStyleSheet("""
+                    background-color: white;
+                    border: 1px solid #2E2E2E;
+                    border-radius: 10px;
+                """)
+                method_label.setFrameShadow(QtWidgets.QFrame.Sunken)
+                method_label.setAlignment(QtCore.Qt.AlignCenter)
+                method_label.setObjectName(f"method_label_{i}")
+                method_label.setText(Method[i-1])
 
-            combo_box = QtWidgets.QComboBox(method_widget)
-            combo_box.addItems(["Option 1", "Option 2", "Option 3"])
-            combo_box.setFixedWidth(150)
-            method_layout.addWidget(combo_box)
+                line_edit = QtWidgets.QLineEdit(method_widget)
+                if method_label.text() != "Kemeny":
+                    combo_box = QtWidgets.QComboBox(method_widget)
+                    combo_box.setGeometry(QtCore.QRect(210, 30, 100, 31))
+                    font = QtGui.QFont()
+                    font.setPointSize(10)
+                    combo_box.setFont(font)
+                    combo_box.setStyleSheet("""
+                        background-color:white;
+                        border: 1px solid #2E2E2E;
+                        border-radius: 10px;
+                    """)
+                    combo_box.setObjectName(f"combo_box_{i}")
+                    combo_box.addItems(["Borda", "Plurality", "Veto"])
+                    line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
+                else:
+                    line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
 
-            line_edit = QtWidgets.QLineEdit(method_widget)
-            line_edit.setFixedWidth(300)
-            method_layout.addWidget(line_edit)
+                line_edit.setStyleSheet("""
+                    background-color:white;
+                    border: 1px solid #2E2E2E;
+                    border-radius: 10px;
+                """)
+                line_edit.setObjectName(f"line_edit_{i}")
 
-            aggregate_layout.addWidget(method_widget)
+                aggregate_layout.addWidget(method_widget)
 
-        self.verticalLayoutInsideScrollArea.addWidget(aggregate_widget)
-        self.scrollAreaWidgetContents.adjustSize()
+            self.verticalLayoutInsideScrollArea.addWidget(aggregate_widget)
+            self.scrollAreaWidgetContents.adjustSize()
 
 
     def retranslateUi(self, Form):
