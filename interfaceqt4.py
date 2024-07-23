@@ -6,6 +6,8 @@ from catergriser_based import categoriser_based_ranking
 from discussion_based import discussion_based
 from matt_and_toni import mt_ranking
 from tuple_based import tuple_based
+from scoring_aggregation.borda_count_aggregation import borda_count_aggregation
+
 
 def load_graph_from_file(filename="graph.gml"):
     G = nx.read_gml(filename)
@@ -274,7 +276,6 @@ class Ui_Form(object):
 
 #♥##############################################################################################################################################
     def on_aggregate_button_clicked(self):
-
         self.aggregateButton.setVisible(False)
 
         separator_label = QtWidgets.QLabel("Aggregation Results")
@@ -293,7 +294,7 @@ class Ui_Form(object):
 
         aggregate_layout = QtWidgets.QVBoxLayout(aggregate_widget)
         aggregate_layout.setContentsMargins(0, 0, 0, 0)
-        Method = ["Score" , "Sequential Winner" , "Sequential Loser" , "Kemeny"]
+        Method = ["Score", "Sequential Winner", "Sequential Loser", "Kemeny"]
         for i in range(1, 5):
             method_widget = QtWidgets.QWidget(aggregate_widget)
             method_widget.setMinimumSize(QtCore.QSize(891, 80))
@@ -346,6 +347,25 @@ class Ui_Form(object):
         self.verticalLayoutInsideScrollArea.addWidget(aggregate_widget)
         self.scrollAreaWidgetContents.adjustSize()
         QtCore.QTimer.singleShot(0, lambda: self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().maximum()))
+
+        rankings = []
+        for i in range(self.verticalLayoutInsideScrollArea.count()):
+                widget = self.verticalLayoutInsideScrollArea.itemAt(i).widget()
+                if widget:
+                    label = widget.findChild(QtWidgets.QLabel, f"label_{i}")
+                    if label:
+                        print(f"Label text of widget {i}:", label.text())
+                    spinbox = widget.findChild(QtWidgets.QSpinBox, f"spinBox_{i}")
+                    if spinbox and spinbox.value() > 0:
+                        if label and label.text() != "alpha burden":
+                            function_name = label.text()
+                            result = self.function_map[function_name]()
+                            rankings.extend([result] * spinbox.value())
+        # Aggregate the rankings
+        result = borda_count_aggregation(rankings)
+        print("the rankings are " , rankings)
+        print("Result:", result)
+
 #♥##############################################################################################################################################
 
     def retranslateUi(self, Form):
