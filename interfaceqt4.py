@@ -282,11 +282,12 @@ class Ui_Form(object):
         QtWidgets.QWidget.resizeEvent(self.alphaContainer, event)
 
 #♥##############################################################################################################################################
+   
+   
     def on_aggregate_button_clicked(self):
         rankings = []
         all_spinboxes_zero = True  # Flag to check if all spinboxes have value 0
 
-        
         for i in range(self.verticalLayoutInsideScrollArea.count()):
             widget = self.verticalLayoutInsideScrollArea.itemAt(i).widget()
             if widget:
@@ -310,14 +311,12 @@ class Ui_Form(object):
                             rankings.extend([result] * spinbox.value())
         if all_spinboxes_zero:
             self.show_error_dialog("No rankings to aggregate!.")
-            
         else:
             # Aggregate the rankings
-            result = borda_count_aggregation(rankings)
+            self.borda_result = borda_count_aggregation(rankings)  # Store the result for later use
             print("the rankings are", rankings)
-            print("Result:", result)
+            print("Result:", self.borda_result)
 
-        
             self.aggregateButton.setVisible(False)
 
             separator_label = QtWidgets.QLabel("Aggregation Results")
@@ -372,7 +371,12 @@ class Ui_Form(object):
                         border-radius: 10px;
                     """)
                     combo_box.setObjectName(f"combo_box_{i}")
-                    combo_box.addItems(["Borda", "Plurality", "Veto"])
+                    combo_box.addItems(["Method", "Borda", "Plurality", "Veto"])
+                    combo_box.setCurrentIndex(0)  # Set the default selection to "Select Method"
+                    combo_box.setItemData(0, QtGui.QColor("gray"), QtCore.Qt.ForegroundRole)  # Set the "Method" item to be gray
+                if method_label.text() == "Score":
+                    if method_label.text() == "Score":
+                        combo_box.currentIndexChanged.connect(lambda index, cb=combo_box, le=line_edit: self.on_score_combobox_changed(cb, le))  # Connect the signal for Score
                     line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
                 else:
                     line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
@@ -389,6 +393,13 @@ class Ui_Form(object):
             self.verticalLayoutInsideScrollArea.addWidget(aggregate_widget)
             self.scrollAreaWidgetContents.adjustSize()
             QtCore.QTimer.singleShot(0, lambda: self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().maximum()))
+
+    def on_score_combobox_changed(self, combobox, line_edit):
+        method_widget = combobox.parentWidget()
+        method_label = method_widget.findChild(QtWidgets.QLabel, method_widget.objectName().replace("method_widget", "method_label"))
+
+        if method_label.text() == "Score" and combobox.currentText() == "Borda":
+            line_edit.setText(rankings_to_string(self.borda_result))  # Set the result to the line edit
 
 
 #♥##############################################################################################################################################
@@ -423,6 +434,8 @@ class RoundedLabel(QtWidgets.QLabel):
             path.addRoundedRect(0, 0, self.width(), self.height(), 15, 15)
             painter.setClipPath(path)
             painter.drawPixmap(0, 0, self.pixmap)
+
+
 
 if __name__ == "__main__":
     import sys
