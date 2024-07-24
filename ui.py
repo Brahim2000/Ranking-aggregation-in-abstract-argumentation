@@ -274,15 +274,22 @@ class Ui_Form(object):
             if widget:
                 label = widget.findChild(QtWidgets.QLabel, f"label_{i}")
                 if label:
-                    print(f"Label text of widget {i}:", label.text())
-                spinbox = widget.findChild(QtWidgets.QSpinBox, f"spinBox_{i}")
-                if spinbox and spinbox.value() > 0:
-                    all_spinboxes_zero = False  # Found a spinbox with a value greater than 0
-                    if label and label.text() != "alpha burden":
-                        function_name = label.text()
-                        result = self.function_map[function_name]()
-                        rankings.extend([result] * spinbox.value())
-
+                    spinbox = widget.findChild(QtWidgets.QSpinBox, f"spinBox_{i}")
+                    if spinbox and spinbox.value() > 0:
+                        all_spinboxes_zero = False  # Found a spinbox with a value greater than 0
+                        if label.text() == "alpha burden":
+                            # Handle alpha burden case
+                            for j in range(self.alphaScrollAreaLayout.count()):
+                                alpha_widget = self.alphaScrollAreaLayout.itemAt(j).widget()
+                                if alpha_widget:
+                                    doubleSpinBox = alpha_widget.findChild(QtWidgets.QDoubleSpinBox)
+                                    if doubleSpinBox and doubleSpinBox.value() > 0:
+                                        result = self.handle_alpha_burden(doubleSpinBox.value())
+                                        rankings.extend([result])
+                        else:
+                            function_name = label.text()
+                            result = self.function_map[function_name]()
+                            rankings.extend([result] * spinbox.value())
         if all_spinboxes_zero:
             self.show_error_dialog("No rankings to aggregate!.")
             

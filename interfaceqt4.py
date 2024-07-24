@@ -44,6 +44,13 @@ class Ui_Form(object):
             return ""
         return alpha_burden_based(self.G, alpha_value)
 
+    def show_error_dialog(self, message):
+                error_dialog = QtWidgets.QMessageBox()
+                error_dialog.setIcon(QtWidgets.QMessageBox.Critical)
+                error_dialog.setText(message)
+                error_dialog.setWindowTitle("Error")
+                error_dialog.exec_()
+
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(968, 780)
@@ -276,95 +283,113 @@ class Ui_Form(object):
 
 #♥##############################################################################################################################################
     def on_aggregate_button_clicked(self):
-        self.aggregateButton.setVisible(False)
+        rankings = []
+        all_spinboxes_zero = True  # Flag to check if all spinboxes have value 0
 
-        separator_label = QtWidgets.QLabel("Aggregation Results")
-        separator_label.setFixedHeight(100)
-        separator_label.setAlignment(QtCore.Qt.AlignCenter)
-        separator_label.setStyleSheet("background-color: green; color: white; font-size: 24px; font-weight: bold;border-radius: 15px;")
-        self.verticalLayoutInsideScrollArea.addWidget(separator_label)
+        
+        for i in range(self.verticalLayoutInsideScrollArea.count()):
+            widget = self.verticalLayoutInsideScrollArea.itemAt(i).widget()
+            if widget:
+                label = widget.findChild(QtWidgets.QLabel, f"label_{i}")
+                if label:
+                    spinbox = widget.findChild(QtWidgets.QSpinBox, f"spinBox_{i}")
+                    if spinbox and spinbox.value() > 0:
+                        all_spinboxes_zero = False  # Found a spinbox with a value greater than 0
+                        if label.text() == "alpha burden":
+                            # Handle alpha burden case
+                            for j in range(self.alphaScrollAreaLayout.count()):
+                                alpha_widget = self.alphaScrollAreaLayout.itemAt(j).widget()
+                                if alpha_widget:
+                                    doubleSpinBox = alpha_widget.findChild(QtWidgets.QDoubleSpinBox)
+                                    if doubleSpinBox and doubleSpinBox.value() > 0:
+                                        result = self.handle_alpha_burden(doubleSpinBox.value())
+                                        rankings.extend([result])
+                        else:
+                            function_name = label.text()
+                            result = self.function_map[function_name]()
+                            rankings.extend([result] * spinbox.value())
+        if all_spinboxes_zero:
+            self.show_error_dialog("No rankings to aggregate!.")
+            
+        else:
+            # Aggregate the rankings
+            result = borda_count_aggregation(rankings)
+            print("the rankings are", rankings)
+            print("Result:", result)
 
-        aggregate_widget = QtWidgets.QWidget(self.scrollAreaWidgetContents)
-        aggregate_widget.setObjectName("aggregate_widget")
+        
+            self.aggregateButton.setVisible(False)
 
-        backgroundLabel = RoundedLabel(aggregate_widget)
-        backgroundLabel.setGeometry(0, 0, 891, 420)
-        backgroundLabel.setObjectName("backgroundLabel_aggregate")
-        backgroundLabel.setPixmap(QtGui.QPixmap('img2.jpg'))
+            separator_label = QtWidgets.QLabel("Aggregation Results")
+            separator_label.setFixedHeight(100)
+            separator_label.setAlignment(QtCore.Qt.AlignCenter)
+            separator_label.setStyleSheet("background-color: green; color: white; font-size: 24px; font-weight: bold;border-radius: 15px;")
+            self.verticalLayoutInsideScrollArea.addWidget(separator_label)
 
-        aggregate_layout = QtWidgets.QVBoxLayout(aggregate_widget)
-        aggregate_layout.setContentsMargins(0, 0, 0, 0)
-        Method = ["Score", "Sequential Winner", "Sequential Loser", "Kemeny"]
-        for i in range(1, 5):
-            method_widget = QtWidgets.QWidget(aggregate_widget)
-            method_widget.setMinimumSize(QtCore.QSize(891, 80))
-            method_widget.setObjectName(f"method_widget_{i}")
-            method_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+            aggregate_widget = QtWidgets.QWidget(self.scrollAreaWidgetContents)
+            aggregate_widget.setObjectName("aggregate_widget")
 
-            method_label = QtWidgets.QLabel(method_widget)
-            method_label.setGeometry(QtCore.QRect(10, 30, 160, 31))
-            font = QtGui.QFont()
-            font.setPointSize(10)
-            method_label.setFont(font)
-            method_label.setAutoFillBackground(False)
-            method_label.setStyleSheet("""
-                background-color: white;
-                border: 1px solid #2E2E2E;
-                border-radius: 10px;
-            """)
-            method_label.setFrameShadow(QtWidgets.QFrame.Sunken)
-            method_label.setAlignment(QtCore.Qt.AlignCenter)
-            method_label.setObjectName(f"method_label_{i}")
-            method_label.setText(Method[i-1])
+            backgroundLabel = RoundedLabel(aggregate_widget)
+            backgroundLabel.setGeometry(0, 0, 891, 420)
+            backgroundLabel.setObjectName("backgroundLabel_aggregate")
+            backgroundLabel.setPixmap(QtGui.QPixmap('img2.jpg'))
 
-            line_edit = QtWidgets.QLineEdit(method_widget)
-            if method_label.text() != "Kemeny":
-                combo_box = QtWidgets.QComboBox(method_widget)
-                combo_box.setGeometry(QtCore.QRect(210, 30, 100, 31))
+            aggregate_layout = QtWidgets.QVBoxLayout(aggregate_widget)
+            aggregate_layout.setContentsMargins(0, 0, 0, 0)
+            Method = ["Score", "Sequential Winner", "Sequential Loser", "Kemeny"]
+            for i in range(1, 5):
+                method_widget = QtWidgets.QWidget(aggregate_widget)
+                method_widget.setMinimumSize(QtCore.QSize(891, 80))
+                method_widget.setObjectName(f"method_widget_{i}")
+                method_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+
+                method_label = QtWidgets.QLabel(method_widget)
+                method_label.setGeometry(QtCore.QRect(10, 30, 160, 31))
                 font = QtGui.QFont()
                 font.setPointSize(10)
-                combo_box.setFont(font)
-                combo_box.setStyleSheet("""
+                method_label.setFont(font)
+                method_label.setAutoFillBackground(False)
+                method_label.setStyleSheet("""
+                    background-color: white;
+                    border: 1px solid #2E2E2E;
+                    border-radius: 10px;
+                """)
+                method_label.setFrameShadow(QtWidgets.QFrame.Sunken)
+                method_label.setAlignment(QtCore.Qt.AlignCenter)
+                method_label.setObjectName(f"method_label_{i}")
+                method_label.setText(Method[i-1])
+
+                line_edit = QtWidgets.QLineEdit(method_widget)
+                if method_label.text() != "Kemeny":
+                    combo_box = QtWidgets.QComboBox(method_widget)
+                    combo_box.setGeometry(QtCore.QRect(210, 30, 100, 31))
+                    font = QtGui.QFont()
+                    font.setPointSize(10)
+                    combo_box.setFont(font)
+                    combo_box.setStyleSheet("""
+                        background-color:white;
+                        border: 1px solid #2E2E2E;
+                        border-radius: 10px;
+                    """)
+                    combo_box.setObjectName(f"combo_box_{i}")
+                    combo_box.addItems(["Borda", "Plurality", "Veto"])
+                    line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
+                else:
+                    line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
+
+                line_edit.setStyleSheet("""
                     background-color:white;
                     border: 1px solid #2E2E2E;
                     border-radius: 10px;
                 """)
-                combo_box.setObjectName(f"combo_box_{i}")
-                combo_box.addItems(["Borda", "Plurality", "Veto"])
-                line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
-            else:
-                line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
+                line_edit.setObjectName(f"line_edit_{i}")
 
-            line_edit.setStyleSheet("""
-                background-color:white;
-                border: 1px solid #2E2E2E;
-                border-radius: 10px;
-            """)
-            line_edit.setObjectName(f"line_edit_{i}")
+                aggregate_layout.addWidget(method_widget)
 
-            aggregate_layout.addWidget(method_widget)
+            self.verticalLayoutInsideScrollArea.addWidget(aggregate_widget)
+            self.scrollAreaWidgetContents.adjustSize()
+            QtCore.QTimer.singleShot(0, lambda: self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().maximum()))
 
-        self.verticalLayoutInsideScrollArea.addWidget(aggregate_widget)
-        self.scrollAreaWidgetContents.adjustSize()
-        QtCore.QTimer.singleShot(0, lambda: self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().maximum()))
-
-        rankings = []
-        for i in range(self.verticalLayoutInsideScrollArea.count()):
-                widget = self.verticalLayoutInsideScrollArea.itemAt(i).widget()
-                if widget:
-                    label = widget.findChild(QtWidgets.QLabel, f"label_{i}")
-                    if label:
-                        print(f"Label text of widget {i}:", label.text())
-                    spinbox = widget.findChild(QtWidgets.QSpinBox, f"spinBox_{i}")
-                    if spinbox and spinbox.value() > 0:
-                        if label and label.text() != "alpha burden":
-                            function_name = label.text()
-                            result = self.function_map[function_name]()
-                            rankings.extend([result] * spinbox.value())
-        # Aggregate the rankings
-        result = borda_count_aggregation(rankings)
-        print("the rankings are " , rankings)
-        print("Result:", result)
 
 #♥##############################################################################################################################################
 
