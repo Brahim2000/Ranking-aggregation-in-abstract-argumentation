@@ -7,6 +7,10 @@ from discussion_based import discussion_based
 from matt_and_toni import mt_ranking
 from tuple_based import tuple_based
 from scoring_aggregation.borda_count_aggregation import borda_count_aggregation
+from scoring_aggregation.pluralityscore import plurality_score_aggregation
+from scoring_aggregation.vetoscore import veto_score_aggregation
+from scoring_aggregation.borda_sequential_winner_aggregation import borda_sequential_winner_aggregation
+from scoring_aggregation.borda_sequential_loser_aggregation import borda_sequential_loser_aggregation
 
 
 def load_graph_from_file(filename="graph.gml"):
@@ -313,9 +317,14 @@ class Ui_Form(object):
             self.show_error_dialog("No rankings to aggregate!.")
         else:
             # Aggregate the rankings
-            self.borda_result = borda_count_aggregation(rankings)  # Store the result for later use
             print("the rankings are", rankings)
-            print("Result:", self.borda_result)
+
+            self.borda_result = borda_count_aggregation(rankings)  # Store the result for later use
+            self.veto_result = veto_score_aggregation(rankings)  # Store the result for later use
+            self.plurality_result = plurality_score_aggregation(rankings)  # Store the result for later use
+            self.borda_winner_result = borda_sequential_winner_aggregation(rankings)  # Store the result for later use
+            self.borda_loser_result = borda_sequential_loser_aggregation(rankings)  # Store the result for later use
+
 
             self.aggregateButton.setVisible(False)
 
@@ -371,12 +380,12 @@ class Ui_Form(object):
                         border-radius: 10px;
                     """)
                     combo_box.setObjectName(f"combo_box_{i}")
-                    combo_box.addItems(["Method", "Borda", "Plurality", "Veto"])
-                    combo_box.setCurrentIndex(0)  # Set the default selection to "Select Method"
+                    combo_box.addItems(["Borda", "Plurality", "Veto"])
+                    combo_box.setCurrentIndex(-1)  # Set the default selection to "Select Method"
                     combo_box.setItemData(0, QtGui.QColor("gray"), QtCore.Qt.ForegroundRole)  # Set the "Method" item to be gray
-                if method_label.text() == "Score":
-                    if method_label.text() == "Score":
-                        combo_box.currentIndexChanged.connect(lambda index, cb=combo_box, le=line_edit: self.on_score_combobox_changed(cb, le))  # Connect the signal for Score
+                
+                    #if method_label.text() == "Score":
+                    combo_box.currentIndexChanged.connect(lambda index, cb=combo_box, le=line_edit: self.on_score_combobox_changed(cb, le))  # Connect the signal for Score
                     line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
                 else:
                     line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
@@ -397,9 +406,22 @@ class Ui_Form(object):
     def on_score_combobox_changed(self, combobox, line_edit):
         method_widget = combobox.parentWidget()
         method_label = method_widget.findChild(QtWidgets.QLabel, method_widget.objectName().replace("method_widget", "method_label"))
-
-        if method_label.text() == "Score" and combobox.currentText() == "Borda":
-            line_edit.setText(rankings_to_string(self.borda_result))  # Set the result to the line edit
+        if  method_label.text() == "Score":
+            match combobox.currentText():
+                case "Borda":
+                    line_edit.setText(rankings_to_string(self.borda_result))  # Set the result to the line edit
+                case "Plurality":
+                    line_edit.setText(rankings_to_string(self.plurality_result))  # Set the result to the line edit
+                case "Veto":
+                    line_edit.setText(rankings_to_string(self.veto_result))  # Set the result to the line edit
+        elif method_label.text() == "Sequential Winner":
+            match combobox.currentText():
+                case "Borda":
+                    line_edit.setText(rankings_to_string(self.borda_winner_result))  # Set the result to the line edit
+        elif method_label.text() == "Sequential Loser":
+            match combobox.currentText():
+                case "Borda":
+                    line_edit.setText(rankings_to_string(self.borda_loser_result))  # Set the result to the line edit
 
 
 #♥##############################################################################################################################################

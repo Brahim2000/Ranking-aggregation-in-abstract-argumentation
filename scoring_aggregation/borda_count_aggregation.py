@@ -69,10 +69,13 @@ import networkx as nx
 G = nx.DiGraph()
 G.add_edges_from([(1, 2), (1, 4), (3, 4), (2, 4)])
 
-ranking1 = categoriser_based_ranking(G)
-ranking2 = discussion_based(G, 1)
-rankings.append(ranking1)
-rankings.append(ranking2)
+ranking1 = [[1], [3], [9], [6], [2, 4], [8], [7], [5]]
+print("ranking 1" , ranking1)
+ranking2 = [[5], [1], [9], [6], [2, 4], [8], [7], [3]]
+print("ranking 2" , ranking2)
+
+rankings.extend(2*[ranking1])
+rankings.extend(3*[ranking2])
 print("Rankings:", rankings)
 
 result = borda_count_aggregation(rankings)
