@@ -40,8 +40,8 @@ def plurality_score_aggregation(rankings):
     for item, score in scores.items():
         print(f"{item}: {score}")
     
-    # Sort items based on scores in descending order
-    sorted_items = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    # Sort items based on scores in ascending order (for losers)
+    sorted_items = sorted(scores.items(), key=lambda x: x[1])
     
     # Group items with the same score into sublists
     result = []
@@ -63,62 +63,37 @@ def plurality_score_aggregation(rankings):
 
 def plurality_sequential_loser_aggregation(rankings):
     """
-    Aggregates rankings sequentially using the Plurality scoring rule and the Sequential Loser method.
-    Returns a list of lists where items with the same score are grouped together.
+    Aggregates rankings sequentially using the Plurality scoring rule and returns a list of lists 
+    where items with the same score are grouped together. All items with the lowest score (0) 
+    are selected as losers and prepended to the consensus ranking.
     """
     aggregated_rankings = []
     remaining_rankings = rankings.copy()
 
-    # Collect all unique items from the rankings
-    items = set()
-    for ranking in rankings:
-        for sublist in ranking:
-            items.update(sublist)
-    
-    scores = {item: 0 for item in items}
+    while remaining_rankings:
+        current_loser_group = plurality_score_aggregation(remaining_rankings)
+        
+        # Select all items with the lowest score (0)
+        losers = current_loser_group[0]
+        aggregated_rankings.insert(0, losers)  # Prepend the losers to the aggregated rankings
 
-    # Calculate initial scores based on rankings
-    for ranking in rankings:
-        if ranking:
-            for sublist in ranking:
-                if sublist:  # Check if sublist is not empty
-                    for item in sublist:
-                        scores[item] += 1
-                    break  # Only the top-ranked items get a score of 1
-
-    # Sequential Loser process
-    while scores:
-        # Find the item with the lowest score
-        lowest_score_item = min(scores, key=scores.get)
-        lowest_score = scores[lowest_score_item]
-
-        # Group items with the same lowest score
-        lowest_score_group = [item for item, score in scores.items() if score == lowest_score]
-        aggregated_rankings.insert(0, lowest_score_group)  # Insert at the beginning to rank them at the bottom
-
-        # Remove the lowest score items from scores
-        for item in lowest_score_group:
-            del scores[item]
-
-        # Recalculate scores for the remaining items
-        scores = {item: 0 for item in scores}
+        # Remove the current losers from remaining rankings
+        new_remaining_rankings = []
         for ranking in remaining_rankings:
-            if ranking:
-                for sublist in ranking:
-                    if sublist:  # Check if sublist is not empty
-                        for item in sublist:
-                            if item in scores:  # Only consider remaining items
-                                scores[item] += 1
-                        break  # Only the top-ranked items get a score of 1
+            new_ranking = []
+            for sublist in ranking:
+                new_sublist = [item for item in sublist if item not in losers]
+                if new_sublist:
+                    new_ranking.append(new_sublist)
+            if new_ranking:
+                new_remaining_rankings.append(new_ranking)
+        remaining_rankings = new_remaining_rankings
 
-    return aggregated_rankings
+    return aggregated_rankings  # No need to reverse, since losers are prepended
 
-# Example usage with a simple graph
 import networkx as nx
 
-G = nx.DiGraph()
-G.add_edges_from([(1, 2), (1, 4), (3, 4), (2, 4)])
-
+# Example rankings
 ranking1 = [[1], [3], [9], [6], [2, 4], [8], [7], [5]]
 print("ranking 1", ranking1)
 ranking2 = [[5], [1], [9], [6], [2, 4], [8], [7], [3]]

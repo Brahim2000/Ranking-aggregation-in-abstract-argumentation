@@ -9,11 +9,11 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from interfaceqt2 import Ui_Dialog
 import networkx as nx
 import matplotlib.pyplot as plt
 import warnings
-import interfaceqt4  # Import the module for the second interface
+import interfaceqt4  # Add this import statement
+
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -38,15 +38,6 @@ class Ui_Form(object):
             with open(fileName, 'r') as file:
                 self.zone_texte.setText(file.read())
 
-    def openDialog(self):
-        self.dialog = QtWidgets.QDialog()
-        self.ui_dialog = Ui_Dialog()
-        self.ui_dialog.setupUi(self.dialog)
-        self.dialog.show()
-        result = self.dialog.exec_()  # This will show the dialog as a modal window
-        if result == QtWidgets.QDialog.Accepted:
-            number_of_agents = self.ui_dialog.spinBox.value()
-            print("Number of agents:", number_of_agents)
 
     def show_error_dialog(self, message):
         error_dialog = QtWidgets.QMessageBox()

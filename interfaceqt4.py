@@ -11,6 +11,11 @@ from scoring_aggregation.pluralityscore import plurality_score_aggregation
 from scoring_aggregation.vetoscore import veto_score_aggregation
 from scoring_aggregation.borda_sequential_winner_aggregation import borda_sequential_winner_aggregation
 from scoring_aggregation.borda_sequential_loser_aggregation import borda_sequential_loser_aggregation
+from scoring_aggregation.pluralitywinner import plurality_sequential_winner_aggregation
+from scoring_aggregation.vetoloser import veto_sequential_loser_aggregation
+from scoring_aggregation.loserplurality import plurality_sequential_loser_aggregation
+from scoring_aggregation.vetowinner import veto_sequential_winner_aggregation
+from scoring_aggregation.kemnew import aggregate_kemeny
 
 
 def load_graph_from_file(filename="graph.gml"):
@@ -38,10 +43,16 @@ class Ui_Form(object):
             "categoriser": lambda: categoriser_based_ranking(self.G),
             "discussion": lambda: discussion_based(self.G, 1),
             "burden": lambda: burden_based(self.G, 10),
-            "tuple": lambda: tuple_based(self.G),
+           "tuple": lambda: tuple_based(self.G),  # Modify here
             "Matt & Toni": lambda: mt_ranking(self.G),
         }
         self.alpha_widgets_values = {}
+
+    def handle_tuple_result(self, result):
+        if result == "graph has cycles can't provide a ranking":
+            return result  # Return directly if the special case
+        return rankings_to_string(result)  # Otherwise, convert to string
+
 
     def handle_alpha_burden(self, alpha_value):
         if alpha_value == 0:
@@ -273,7 +284,11 @@ class Ui_Form(object):
         if spinbox_value == 0:
             line_edit.clear()
         else:
-            line_edit.setText(rankings_to_string(result))
+            if isinstance(result, str) and result == "graph has cycles can't provide a ranking":
+                line_edit.setText(result)  # Directly set the special string
+            else:
+                line_edit.setText(rankings_to_string(result))
+
 
     def update_line_edit_for_alpha(self, line_edit, alpha_value):
         result = self.handle_alpha_burden(alpha_value)
@@ -286,7 +301,6 @@ class Ui_Form(object):
         QtWidgets.QWidget.resizeEvent(self.alphaContainer, event)
 
 #♥##############################################################################################################################################
-   
    
     def on_aggregate_button_clicked(self):
         rankings = []
@@ -312,7 +326,14 @@ class Ui_Form(object):
                         else:
                             function_name = label.text()
                             result = self.function_map[function_name]()
+                            
+                            # Check if the result is the special string for tuple
+                            if result == "graph has cycles can't provide a ranking":
+                                # Do not add to rankings
+                                continue
+                            
                             rankings.extend([result] * spinbox.value())
+
         if all_spinboxes_zero:
             self.show_error_dialog("No rankings to aggregate!.")
         else:
@@ -324,8 +345,11 @@ class Ui_Form(object):
             self.plurality_result = plurality_score_aggregation(rankings)  # Store the result for later use
             self.borda_winner_result = borda_sequential_winner_aggregation(rankings)  # Store the result for later use
             self.borda_loser_result = borda_sequential_loser_aggregation(rankings)  # Store the result for later use
-
-
+            self.plurality_winner_result = plurality_sequential_winner_aggregation(rankings)  # Store the result for later use
+            self.veto_loser_result = veto_sequential_loser_aggregation(rankings)  # Store the result for later use
+            self.plurality_loser_result = plurality_sequential_loser_aggregation(rankings)
+            self.veto_winner_result = veto_sequential_winner_aggregation(rankings)
+            self.kemeny_result = aggregate_kemeny(rankings)
             self.aggregateButton.setVisible(False)
 
             separator_label = QtWidgets.QLabel("Aggregation Results")
@@ -389,7 +413,7 @@ class Ui_Form(object):
                     line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
                 else:
                     line_edit.setGeometry(QtCore.QRect(400, 31, 391, 31))
-
+                    line_edit.setText(rankings_to_string(self.kemeny_result))
                 line_edit.setStyleSheet("""
                     background-color:white;
                     border: 1px solid #2E2E2E;
@@ -402,6 +426,7 @@ class Ui_Form(object):
             self.verticalLayoutInsideScrollArea.addWidget(aggregate_widget)
             self.scrollAreaWidgetContents.adjustSize()
             QtCore.QTimer.singleShot(0, lambda: self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().maximum()))
+
 
     def on_score_combobox_changed(self, combobox, line_edit):
         method_widget = combobox.parentWidget()
@@ -418,11 +443,18 @@ class Ui_Form(object):
             match combobox.currentText():
                 case "Borda":
                     line_edit.setText(rankings_to_string(self.borda_winner_result))  # Set the result to the line edit
+                case "Plurality":
+                    line_edit.setText(rankings_to_string(self.plurality_winner_result))  # Set the result to the line edit    
+                case "Veto":
+                    line_edit.setText(rankings_to_string(self.veto_winner_result))  # Set the result to the line edit    
         elif method_label.text() == "Sequential Loser":
             match combobox.currentText():
                 case "Borda":
                     line_edit.setText(rankings_to_string(self.borda_loser_result))  # Set the result to the line edit
-
+                case "Veto":
+                    line_edit.setText(rankings_to_string(self.veto_loser_result))  # Set the result to the line edit 
+                case "Plurality":
+                    line_edit.setText(rankings_to_string(self.plurality_loser_result))  # Set the result to the line edit    
 
 #♥##############################################################################################################################################
 

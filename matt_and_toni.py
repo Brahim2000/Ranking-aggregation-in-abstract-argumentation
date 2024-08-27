@@ -1,31 +1,29 @@
-# Calculate the strengths of each argument
 import networkx as nx
 
 def calculate_strengths(G):
-  strengths = {}
-  for node in G.nodes():
-    strengths[node] = 1 - max([max([G.edges[x, y].get('weight', nx.pagerank(G)[node]), nx.pagerank(G)[y]]) for x, y in G.in_edges(node)] + [0])
-  return strengths
+    strengths = {}
+    pageranks = nx.pagerank(G)
+    
+    for node in G.nodes():
+        if G.in_degree(node) == 0:  # Non-attacked arguments
+            strengths[node] = 1  # Assign the highest possible strength
+        else:
+            strengths[node] = 1 - max([max([G.edges[x, y].get('weight', pageranks[node]), pageranks[y]]) for x, y in G.in_edges(node)] + [0])
+    
+    return strengths
 
-
-
-# Assign ranks to each argument based on strength and value of zero-sum game
 def zero_sum(G):
-  s = calculate_strengths(G)
-  values = {}
-  for x in G.nodes():
-      value = 0
-      for y in G.nodes():
-          if (x, y) in G.edges:
-              value += s[y]
-          elif (y, x) in G.edges:
-              value -= s[y]
-      values[x] = value
-  return values
-
-
-
-# Define the Matt and Toni ranking 
+    s = calculate_strengths(G)
+    values = {}
+    for x in G.nodes():
+        value = 0
+        for y in G.nodes():
+            if (x, y) in G.edges:
+                value += s[y]
+            elif (y, x) in G.edges:
+                value -= s[y]
+        values[x] = value
+    return values
 
 def mt_ranking(G):
     values = zero_sum(G)
