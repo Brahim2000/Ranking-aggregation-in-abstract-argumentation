@@ -85,7 +85,7 @@ class Ui_Form(object):
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 920, 569))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-
+        
         self.verticalLayoutInsideScrollArea = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayoutInsideScrollArea.setObjectName("verticalLayoutInsideScrollArea")
 
