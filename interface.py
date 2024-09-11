@@ -161,13 +161,13 @@ class Ui_Form(object):
         if self.G.number_of_nodes() == 0 or self.G.number_of_edges() == 0:
             self.show_error_dialog("No graph has been entered.")
         else:
-            self.open_interfaceqt4()  # Open the new interface instead of the dialog
+            self.open_interface2()  # Open the new interface instead of the dialog
 
-    def open_interfaceqt4(self):
-        self.interfaceqt4_window = QtWidgets.QWidget()
-        self.ui_interfaceqt4 = interfaceqt4.Ui_Form()
-        self.ui_interfaceqt4.setupUi(self.interfaceqt4_window)
-        self.interfaceqt4_window.show()
+    def open_interface2(self):
+        self.interface2_window = QtWidgets.QWidget()
+        self.ui_interface2 = interface2.Ui_Form()
+        self.ui_interface2.setupUi(self.interface2_window)
+        self.interface2_window.show()
 
 if __name__ == "__main__":
     import sys
