@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import networkx as nx
 import matplotlib.pyplot as plt
 import warnings
-import interfaceqt4  # Add this import statement
+import interface2  # Add this import statement
 
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)

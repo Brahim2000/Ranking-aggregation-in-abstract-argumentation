@@ -14,5 +14,14 @@ existing semantics in this project :
 6 - Matt & Toni
 
 # To use this application 
-run the command : pip install networkx
+- Install python in your machine
 
+- Run the command : pip install networkx
+
+- Start the application : python interface.py
+
+- Open a graph from a file or type your own (example in input.txt)
+
+- You can click on "Display" if you want to visualize it
+
+- Once your graph is ready, you can see the results by clicking on "Validate"
