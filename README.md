@@ -1,4 +1,4 @@
-# ranking-semantics-Abstract-Argumentation
+# Aggregation of rankings in abstract argumentation
 existing semantics in this project :
 
 1 - Categoriser-based ranking semantics
@@ -12,6 +12,18 @@ existing semantics in this project :
 5 - Tuples-based semantics
 
 6 - Matt & Toni
+
+existing aggregation methods :
+
+1 - Kemeny
+
+2 - s-Score
+
+3 - s-Sequential-Winner
+
+4 - s-Sequential-Loser
+
+with s ∈ {Borda, Veto, Plurality}
 
 # To use this application 
 - Install python in your machine
