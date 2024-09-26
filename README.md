@@ -28,8 +28,6 @@ with s ∈ {Borda, Veto, Plurality}
 # To use this application 
 - Install python in your machine
 
-- Run the command : pip install networkx
-
 - Start the application : python interface.py
 
 - Open a graph from a file or type your own (example in input.txt)
