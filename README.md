@@ -35,3 +35,6 @@ with s ∈ {Borda, Veto, Plurality}
 - You can click on "Display" if you want to visualize it
 
 - Once your graph is ready, you can see the results by clicking on "Validate"
+
+Or you can download the executable file from this link: [Download executable file](https://drive.google.com/drive/folders/1IDt--5MRWs2q9qpSt1bF0kM6f3_IcWUc?usp=sharing)
+
